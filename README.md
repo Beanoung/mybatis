@@ -1,2 +1,2 @@
 # mybatis
-some notes
+MyBatis projects
