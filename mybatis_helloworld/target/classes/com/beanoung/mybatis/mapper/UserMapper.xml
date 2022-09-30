@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 两个一致 -->
+<!-- mapper映射文件namespace要和对应的mapper接口全类名一致 -->
+<mapper namespace="com.beanoung.mybatis.mapper.UserMapper">
+
+
+    <!-- 映射文件中id要和mapper接口中的方法名一致 -->
+    <insert id="insertUser">
+        insert into t_user values(null,'admin','123456',23,'男','123456@qq.com')
+    </insert>
+
+    <!--int updateUser();-->
+    <update id="updateUser">
+        update t_user set password = 'new123' where id = 2
+    </update>
+
+    <!-- int deleteUser(); -->
+    <delete id="deleteUser">
+        delete from t_user where id = 3
+    </delete>
+
+    <!-- User selectUser(); -->
+    <!--
+        resultType:设置结果类型,即查询的数据要转换为java类型
+        resultMap:自定义映射,处理多对一或一对多的映射关系
+     -->
+    <select id="selectUser" resultType="com.beanoung.mybatis.pojo.User">
+        select * from t_user where id = 1
+    </select>
+
+    <!-- List<User> selectAllUser(); -->
+    <select id="selectAllUser" resultType="user">
+        select * from t_user
+    </select>
+</mapper>
