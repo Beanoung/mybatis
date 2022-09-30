@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beanoung.mybatis.mapper.UserMapper">
+
+    <!-- User getUserByUsername(String username); -->
+    <select id="getUserByUsername" resultType="User">
+        <!-- 可以通过任意的#{abc},但是建议用一样的名字 -->
+        <!-- select * from t_user where username = #{username} -->
+        <!-- 要加单引号,{}内不能用纯数字,因为$有运算的功能 -->
+        select * from t_user where username = '${username}'
+    </select>
+
+    <!-- User checkLogin(String username,String password); -->
+    <select id="checkLogin" resultType="User">
+        <!-- 多参数时,MyBatis把参数放到map中,以键获取值 -->
+        <!-- 第一种,arg0,arg1...  第二种,param1,param2... -->
+        select * from t_user where username = #{param1} and password = #{param2}
+    </select>
+
+    <!-- User checkLoginByMap(Map<String,Object> map); -->
+    <!-- 这里是我们自己设置的键值对,就可以不用MyBatis的map -->
+    <select id="checkLoginByMap" resultType="User">
+        select * from t_user where username = #{username} and password = #{password}
+    </select>
+
+    <!-- int insertUser(User user); -->
+    <insert id="insertUser">
+        <!-- #{}访问属性名 -->
+        insert into t_user values(null,#{username},#{password},#{age},#{gender},#{email})
+    </insert>
+
+    <!-- User checkLoginByParam(@Param("username") String username,@Param("password") String password); -->
+    <select id="checkLoginByParam" resultType="User">
+        select * from t_user where username = #{username} and password = #{password}
+    </select>
+
+</mapper>

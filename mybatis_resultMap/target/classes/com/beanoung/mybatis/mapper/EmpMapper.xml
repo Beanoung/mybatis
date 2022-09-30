@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.beanoung.mybatis.mapper.EmpMapper">
+    <!-- 处理字段名和属性名不一致,三种方法 -->
+    <!-- Emp getEmpById(@Param("empId") Integer empId); -->
+    <select id="getEmpByIdOld" resultType="Emp">
+        <!-- select * from t_emp where emp_id = #{empId} -->
+        <!-- 法1:  字段和属性名不一样,所以上面这个查不出id和name,下面这个就可以 -->
+        <!-- select emp_id empId,emp_name empName,age,gender from t_emp where emp_id = #{empId} -->
+        <!--
+         法2:  或者在mybatis核心配置文件中全局设置下划线映射为驼峰,就不需要起别名
+         字段要符合mysql规则,emp_id
+         属性也要符合java规则,empId
+         emp_id->empId
+         -->
+        select * from t_emp where emp_id = #{empId}
+    </select>
+    <!-- 法3:  使用resultMap自定义映射 -->
+    <resultMap id="empResultMap" type="Emp">
+        <!-- id是主键的,result是普通字段的 -->
+        <id column="emp_id" property="empId"></id>
+        <result column="emp_name" property="empName"></result>
+        <result column="age" property="age"></result>
+        <result column="gender" property="gender"></result>
+    </resultMap>
+    <select id="getEmpById" resultMap="empResultMap">
+        select * from t_emp where emp_id = #{empId}
+    </select>
+
+    <!--
+     处理多对一的关系,三种方法
+     -->
+    <!-- 法1:  级联 -->
+    <resultMap id="empAndDeptOld" type="Emp">
+        <id column="" property=""></id>
+        <result column="emp_id" property="empId"></result>
+        <result column="emp_name" property="empName"></result>
+        <result column="age" property="age"></result>
+        <result column="gender" property="gender"></result>
+        <result column="dept_id" property="dept.deptId"></result>
+        <result column="dept_name" property="dept.deptName"></result>
+    </resultMap>
+    <!-- 法2:  association标签 -->
+    <resultMap id="empAndDept" type="Emp">
+        <id column="emp_id" property="empId"></id>
+        <result column="emp_name" property="empName"></result>
+        <result column="age" property="age"></result>
+        <result column="gender" property="gender"></result>
+        <!--
+         property: 设置需要处理映射关系的属性的属性名
+         javaType: 设置需要处理的属性的类型
+         -->
+        <association property="dept" javaType="Dept">
+            <id column="dept_id" property="deptId"></id>
+            <result column="dept_name" property="deptName"></result>
+        </association>
+    </resultMap>
+
+    <!-- Emp getEmpAndDept(@Param("empId") Integer empId); -->
+    <select id="getEmpAndDept" resultMap="empAndDept">
+        select * from t_emp left join t_dept on t_emp.dept_id = t_dept.dept_id where t_emp.emp_id = #{empId}
+    </select>
+
+    <!-- 法3:  分步查询 -->
+    <resultMap id="empAndDeptByStep" type="Emp">
+        <id column="emp_id" property="empId"></id>
+        <result column="emp_name" property="empName"></result>
+        <result column="age" property="age"></result>
+        <result column="gender" property="gender"></result>
+        <!--
+         property: 实体类中的属性名
+         select: 分步查询的sql的唯一标识
+         column: 将查询出的某个字段作为分步查询的sql的条件
+         fetchType:当我们全局配置为延迟加载,但某一个查询想立即加载,这里可以设置为eager     lazy延迟加载,eager立即加载
+         -->
+        <association property="dept" fetchType="eager"
+                     select="com.beanoung.mybatis.mapper.DeptMapper.getEmpAndDeptByStepTwo"
+                     column="dept_id">
+        </association>
+    </resultMap>
+
+    <!-- Emp getEmpAndDeptByStep(@Param("empId") Integer empId); -->
+    <select id="getEmpAndDeptByStep" resultMap="empAndDeptByStep">
+        select * from t_emp where emp_id = #{empId}
+    </select>
+
+    <!-- 一对多,分步查询第二步 -->
+    <!-- List<Emp> getDeptAndEmpByStepTwo(@Param("deptId") Integer deptId); -->
+    <select id="getDeptAndEmpByStepTwo" resultType="Emp">
+        select * from t_emp where dept_id = #{deptId}
+    </select>
+</mapper>
