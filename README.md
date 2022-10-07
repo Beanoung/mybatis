@@ -1,2 +1,2 @@
 # mybatis
-MyBatis projects
+MyBatis tests
